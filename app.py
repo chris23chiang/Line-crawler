@@ -1,3 +1,4 @@
+# FOR TWM
 
 from flask import Flask, request, abort
 
@@ -10,6 +11,16 @@ from linebot.exceptions import (
 from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage,  StickerSendMessage
 )
+
+#爬蟲的套件
+import requests
+from requests_html import HTML
+
+# 計時器相關套件
+import time
+import datetime as dt
+
+URL = 'https://www.ptt.cc/bbs/MobileComm/index.html' # 目標看板網址
 
 app = Flask(__name__)
 
@@ -38,31 +49,48 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    msg = event.message.text
-    s = '很抱歉，您說什麼?'
+    KEYWORD = event.message.text
+    t = dt.datetime # 顯示時間用的
+    
+    def fetch(url): #把網頁的內容抓回來
+        response = requests.get(url, cookies={'over18':'1'})
+        return response
 
-    if '貼圖' in msg:
-        sticker_message = StickerSendMessage(
-            package_id='1',
-            sticker_id='1'
-        )
-        
-        line_bot_api.reply_message(event.reply_token,sticker_message)
-        return
+    def parse_article_entries(doc): #用 requests_html 取 div.r-ent
+        html = HTML( html = doc )
+        post_entries = html.find('div.r-ent')
+        return post_entries
 
-    if msg in ['hi', 'Hi']:
-        s = '嗨!'
-    elif msg == '你吃飯了嗎':
-        s = '還沒'
-    elif msg == '你是誰':
-        s = '我是機器人'
-    elif '訂位' in msg:
-        s = '你想訂位，是嗎?'
+    def parse_article_meta(entry): #r-ent的內容格式化成 dict'
+        meta = {
+            'title': entry.find('div.title', first=True).text,
+            'push': entry.find('div.nrec', first=True).text,
+            'date': entry.find('div.date', first=True).text
+        }
+        try:
+            # 正常的文章可以取得作者和連結
+            meta['author'] = entry.find('div.author', first=True).text
+            meta['link'] = entry.find('div.title > a', first=True).attrs['href']
+        except AttributeError:
+            # 被刪除的文章我們就不要了
+            meta['author'] = '[Deleted]'
+            meta['link'] = '[Deleted]'
+        return meta
 
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=s))
+    def ptt_alert(url, keyword):
+        url = url 
+        resp = fetch(url) # 取得網頁內容
+        post_entries = parse_article_entries(resp.text) # 取得各列標題
 
+        for entry in post_entries:
+            meta = parse_article_meta(entry)
+
+            if keyword in meta['title'].lower() and not "截止" in meta['title']:
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='在「PTT手機討論版」發現關鍵字：「' + KEYWORD + '」！\n\n 標題：' + meta['title'] + ' \nhttps://www.ptt.cc' + meta['link']+'\n\n 人氣:' + meta['push']))
+            else:
+                line_bot_api.reply_message(event.reply_token, TextSendMessage(text='沒有搜尋到相關的文章，可輸入其他關鍵字試試看'))
+
+    ptt_alert(URL, KEYWORD)
 
 if __name__ == "__main__":
     app.run()
