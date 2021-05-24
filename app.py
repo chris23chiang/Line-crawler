@@ -82,7 +82,7 @@ def handle_message(event):
         for entry in post_entries:
             meta = parse_article_meta(entry)
             if keyword in meta['title'].lower() and not "截止" in meta['title']:
-                s = '找到了'
+                s = '在「PTT手機討論版」發現關鍵字：「' + KEYWORD + '」！\n\n 標題：' + meta['title'] + ' \nhttps://www.ptt.cc' + meta['link']+'\n\n 人氣:' + meta['push']
                 return s
             else:
                 continue
