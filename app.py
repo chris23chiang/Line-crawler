@@ -83,17 +83,18 @@ def handle_message(event):
             meta = parse_article_meta(entry)
             if keyword in meta['title'].lower() and not "截止" in meta['title']:
                 s = '在「PTT手機討論版」發現關鍵字：「' + KEYWORD + '」！\n\n 標題：' + meta['title'] + ' \nhttps://www.ptt.cc' + meta['link']+'\n\n 人氣:' + meta['push']
-                return s
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(text=s))
+                continue
             else:
                 continue
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text='沒有搜尋到其他相關的文章，可輸入其他關鍵字試試看!'))
     
-    s = ptt_alert(URL, KEYWORD)
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=s))
+    ptt_alert(URL, KEYWORD)
+    
 
 if __name__ == "__main__":
     app.run()
