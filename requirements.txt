@@ -3,5 +3,3 @@ gunicorn
 flask
 requests
 requests_html
-time
-datetime
