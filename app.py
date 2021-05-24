@@ -94,7 +94,7 @@ def handle_message(event):
     
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text=ptt_alert(URL, KEYWORD)))
+        TextSendMessage(text='ptt_alert(URL, KEYWORD')))
 
 if __name__ == "__main__":
     app.run()
