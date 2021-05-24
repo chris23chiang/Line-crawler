@@ -92,10 +92,9 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text='沒有搜尋到其他相關的文章，可輸入其他關鍵字試試看!')
     
-    s = ptt_alert(URL, KEYWORD)
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text=s))
+        TextSendMessage(text=ptt_alert(URL, KEYWORD)))
 
 if __name__ == "__main__":
     app.run()
