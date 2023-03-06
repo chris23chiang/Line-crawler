@@ -22,8 +22,8 @@ import datetime as dt
 
 app = Flask(__name__)
 
-line_bot_api = LineBotApi('8w7Yod9eSIcC19Y2YpM1SGc46rc4OJhNQyC0ib/M9LBGRc6NFVwItlUGbOQ8M05R7vAEzazGEE6ehST2D692RR8h1RyZ1xE7banVgxBhieX/VWJeWjx6TvCiv4gq0uOAGKUqMtVZFBRovy1EzFl6hQdB04t89/1O/w1cDnyilFU=')
-handler = WebhookHandler('36de434b16c6f81eebb94b8bf514b4ca')
+line_bot_api = LineBotApi('LtF9dmkl0nYfGn8cQ/0IrfxV8jt9qQVf/XYICwGox8L1HN2LAiSo1aSV6BLocLvk7vAEzazGEE6ehST2D692RR8h1RyZ1xE7banVgxBhieV5uTPclulirh9VAplAU86RAYs/wF+WCu2Cp0xio/wm9AdB04t89/1O/w1cDnyilFU=')
+handler = WebhookHandler('3c1735896500930730bc040c7d4c964e')
 
 
 @app.route("/callback", methods=['POST'])
